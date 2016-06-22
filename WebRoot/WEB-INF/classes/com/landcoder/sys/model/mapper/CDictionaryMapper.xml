@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.landcoder.sys.model.CDictionary">
+
+	<resultMap id="rm" type="com.landcoder.sys.model.CDictionary">
+        <result property="id" column="id"/>
+        <result property="dictName" column="dict_name"/>
+        <result property="dictVal" column="dict_val"/>
+        <result property="pid" column="pid"/>
+	</resultMap>
+	
+	<sql id="columns">
+	    <![CDATA[
+		id,dict_name,dict_val,pid
+	    ]]>
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO c_dictionary ( id , dict_name , dict_val , pid ) 
+        VALUES (#{id} ,#{dictName} ,#{dictVal} ,#{pid} )
+    ]]>
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE c_dictionary SET
+	        dict_name = #{dictName} ,
+	        dict_val = #{dictVal} ,
+	        pid = #{pid} 
+        WHERE id = #{id}
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM c_dictionary WHERE
+        id = #{id}
+    ]]>
+    </delete>
+    
+    <select id="getById" resultMap="rm">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM c_dictionary 
+	        WHERE id = #{id}
+	    ]]>
+	</select>
+	
+	<sql id="findByWhere">
+		<where>	      				
+	       <if test="id!=null">
+				AND id = #{id}
+			</if>
+	       <if test="dictName!=null and dictName!=''">
+				AND dict_name = #{dictName}
+			</if>
+	       <if test="dictVal!=null and dictVal!=''">
+				AND dict_val = #{dictVal}
+			</if>
+	       <if test="pid!=null">
+				AND pid = #{pid}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="findOne" resultMap="rm">
+        SELECT <include refid="columns" /> FROM c_dictionary 
+		<include refid="findByWhere"/>    
+    </select>
+	
+	<select id="findcount" resultType="long">
+        SELECT count(*) FROM c_dictionary 
+		<include refid="findByWhere"/>    
+    </select>
+    
+    <select id="findlist" resultMap="rm">
+    	SELECT <include refid="columns" />
+	    FROM c_dictionary 
+		<include refid="findByWhere"/>
+		<if test="sortColumns!=null and sortColumns!=''">
+			ORDER BY ${sortColumns}
+		</if>
+		<if test="cpage!=null and pageSize!=null">
+			limit ${startSize},${pageSize}
+		</if>
+    </select>
+    
+    <select id="findPartlist" resultMap="rm">
+    	SELECT <include refid="columns" />
+		<![CDATA[
+		  	FROM c_dictionary 
+	        WHERE pid>0
+	    ]]>
+    </select>
+</mapper>
+
